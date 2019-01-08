@@ -10,9 +10,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    private static String API_KEY = "AIzaSyA_P393AUgL4nGoYCUmWRqFxTPmivgzogs";
     private GoogleMap mMap;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
