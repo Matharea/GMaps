@@ -23,56 +23,56 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    private GoogleMap mMap;
     LocationManager mLocationManager = null;
     final int reqCode = 100;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_maps);
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
         checkPermission();
-
-
     }
 
-    @SuppressLint("MissingPermission")
-    public void initLocation(){
 
-        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
 
-        LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-
-                Context context = getApplicationContext();
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast= Toast.makeText(context,location.toString(),duration);
-                toast.show();
-
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-            public void onProviderEnabled(String provider) {}
-
-            public void onProviderDisabled(String provider) {}
-        };
-
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        // Add a marker in Sydney and move the camera
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     private void checkPermission(){
         // vérification de l'autorisation d'accéder à la position GPS
-        if (ContextCompat.checkSelfPermission(MainActivity.this,
+        if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
 
             // l'autorisation n'est pas acceptée
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.READ_CONTACTS)) {
                 // l'autorisation a été refusée précédemment, on peut prévenir l'utilisateur ici
             } else {
                 // l'autorisation n'a jamais été réclamée, on la demande à l'utilisateur
-                ActivityCompat.requestPermissions(MainActivity.this,
+                ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         reqCode);
 
@@ -84,6 +84,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // TODO : autorisation déjà acceptée, on peut faire une action ici
             initLocation();
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    public void initLocation(){
+
+        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+
+//                Context context = getApplicationContext();
+//                int duration = Toast.LENGTH_SHORT;
+//                Toast toast= Toast.makeText(context,location.toString(),duration);
+//                toast.show();
+
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+            public void onProviderEnabled(String provider) {}
+
+            public void onProviderDisabled(String provider) {}
+        };
+
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }
 
     @Override
@@ -104,10 +129,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
         }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
     }
 }
