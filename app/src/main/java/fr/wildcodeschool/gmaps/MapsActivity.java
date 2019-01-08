@@ -166,7 +166,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + marker.getPosition().latitude+ ", " + marker.getPosition().longitude + "&mode=b");
+                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + marker.getPosition().latitude
+                        + ", " + marker.getPosition().longitude + "&mode=b");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 startActivity(mapIntent);
