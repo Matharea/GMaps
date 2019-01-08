@@ -11,7 +11,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,6 +30,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng currentPosition;
     private Boolean locationRdy = false;
     private Boolean mapRdy = false;
+    private Float zoomMax;
+    private Float zoomMin;
 
 
     @Override
@@ -43,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         checkPermission();
+
     }
 
 
@@ -130,22 +132,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        zoomMax = 15f;
+        zoomMin = 12f;
         mMap = googleMap;
         mapRdy = true;
-
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
         if (currentPosition != null) {
             showPosition(mMap);
         }
     }
 
-    public void showPosition(GoogleMap mMap) {
-        if (marker != null) {
+    public void showPosition(final GoogleMap mMap) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(currentPosition));
+        if (marker != null)
             marker.remove();
-        } else {
-            marker = mMap.addMarker(new MarkerOptions().position(currentPosition).title("Marker's on me"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
-        }
+        
+        mMap.setMaxZoomPreference(zoomMax);
+        mMap.setMinZoomPreference(zoomMin);
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(latLng));
+            }
+        });
+
     }
+
+
+
 }
+
