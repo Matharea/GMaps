@@ -3,35 +3,40 @@ package fr.wildcodeschool.gmaps;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
 
     private GoogleMap mMap;
+    private float zoomMax = 15f;
+    private float zoomMin = 12f;
+    private LatLngBounds BORDEAUX;
     private Marker marker;
     LocationManager mLocationManager = null;
     private static final int FINE_LOCATION_REQUEST = 100;
     private LatLng currentPosition;
     private Boolean locationRdy = false;
     private Boolean mapRdy = false;
-    private Float zoomMax;
-    private Float zoomMin;
 
 
     @Override
@@ -44,7 +49,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         checkPermission();
-
     }
 
 
@@ -135,25 +139,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        zoomMax = 15f;
-        zoomMin = 12f;
         mMap = googleMap;
         mapRdy = true;
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.setMaxZoomPreference(zoomMax);
+        mMap.setMinZoomPreference(zoomMin);
+        BORDEAUX = new LatLngBounds(new LatLng(44.789078f, -0.651964f), new LatLng(44.870402f, -0.506396f));
+
         if (currentPosition != null) {
             showPosition(mMap);
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void showPosition(final GoogleMap mMap) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(currentPosition));
-        if (marker != null)
-            marker.remove();
-        
-        mMap.setMaxZoomPreference(zoomMax);
-        mMap.setMinZoomPreference(zoomMin);
-
+        mMap.setLatLngBoundsForCameraTarget(BORDEAUX);
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -162,9 +163,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Uri gmmIntentUri = Uri.parse("geo:" + marker.getPosition().latitude + ", "+ marker.getPosition().longitude);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
+                return true;
+            }
+        });
     }
-
-
-
 }
-
