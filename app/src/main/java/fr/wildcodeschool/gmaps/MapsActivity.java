@@ -18,16 +18,19 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private Marker marker;
     LocationManager mLocationManager = null;
     private static final int FINE_LOCATION_REQUEST = 100;
     private LatLng currentPosition;
     private Boolean locationRdy = false;
+    private Boolean mapRdy = false;
 
 
     @Override
@@ -90,7 +93,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
                 locationRdy = true;
-                showPosition(mMap);
+                if(mapRdy)
+                    showPosition(mMap);
 //                Context context = getApplicationContext();
 //                int duration = Toast.LENGTH_SHORT;
 //                Toast toast= Toast.makeText(context,location.toString(),duration);
@@ -129,14 +133,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mapRdy = true;
 
         if (currentPosition != null) {
             showPosition(mMap);
         }
     }
 
-    public void showPosition(GoogleMap mMap){
-        mMap.addMarker(new MarkerOptions().position(currentPosition).title("Marker's on me"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
+    public void showPosition(GoogleMap mMap) {
+        if (marker != null) {
+            marker.remove();
+        } else {
+            marker = mMap.addMarker(new MarkerOptions().position(currentPosition).title("Marker's on me"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
+        }
     }
 }
